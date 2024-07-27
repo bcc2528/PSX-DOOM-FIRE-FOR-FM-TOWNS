@@ -78,7 +78,7 @@ void spread_fire() {
                 fire_pixels[from - FIRE_WIDTH] = 0;
             } else {
                 rand_num = rand_num * 1103515245 + 12345;
-                random = (rand_num & 214748364) % 3;
+                random = (rand_num & 2147483647) % 3;
                 //random = rand() % 3;
                 fire_pixels[(from - random + 1) - FIRE_WIDTH] = fire_pixels[from] - (random & 1);
             }
