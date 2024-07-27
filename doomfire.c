@@ -56,6 +56,8 @@ unsigned char fire_pixels[FIRE_HEIGHT * FIRE_WIDTH];
 
 int chatter = 0;
 
+int rand_num = 1;
+
 void start_fire() {
     memset(&fire_pixels[(FIRE_HEIGHT - 1) * FIRE_WIDTH], NUM_COLORS - 1, FIRE_WIDTH);
 }
@@ -75,7 +77,9 @@ void spread_fire() {
             if (fire_pixels[from] == 0) {
                 fire_pixels[from - FIRE_WIDTH] = 0;
             } else {
-                random = rand() % 3;
+                rand_num = rand_num * 1103515245 + 12345;
+                random = (rand_num & 214748364) % 3;
+                //random = rand() % 3;
                 fire_pixels[(from - random + 1) - FIRE_WIDTH] = fire_pixels[from] - (random & 1);
             }
             from++;
