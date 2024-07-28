@@ -71,15 +71,14 @@ void stop_fire() {
 
 void spread_fire() {
     int from, random;
+    from = FIRE_WIDTH;
     for (int i = 1; i < FIRE_HEIGHT; i++) {
-        from = i * FIRE_WIDTH;
         for (int y = 0; y < FIRE_WIDTH; y++) {
             if (fire_pixels[from] == 0) {
                 fire_pixels[from - FIRE_WIDTH] = 0;
             } else {
                 rand_num = rand_num * 1103515245 + 12345;
                 random = (rand_num & 2147483647) % 3;
-                //random = rand() % 3;
                 fire_pixels[(from - random + 1) - FIRE_WIDTH] = fire_pixels[from] - (random & 1);
             }
             from++;
