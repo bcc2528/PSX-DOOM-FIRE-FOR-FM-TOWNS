@@ -4,12 +4,15 @@
 #include <egb.h>
 #include <snd.h>
 #include <msdos.cf>
+#include <dos.h>
 
-char work[EgbWorkSize];
+char *work;
 char    para[16];
 
 #define FIRE_WIDTH 320
 #define FIRE_HEIGHT 160
+// 51200 = FIRE_WIDTH * FIRE_HEIGHT
+#define FIRE_SIZE 51200
 #define NUM_COLORS 37
 
 unsigned char rgb_pallete[NUM_COLORS][3] = {
@@ -52,7 +55,8 @@ unsigned char rgb_pallete[NUM_COLORS][3] = {
     { 0xFF,0xFF,0xFF },
 };
 
-unsigned char fire_pixels[FIRE_HEIGHT * FIRE_WIDTH];
+//unsigned char fire_pixels[FIRE_HEIGHT * FIRE_WIDTH];
+unsigned char *fire_pixels;
 
 int chatter = 0;
 
@@ -71,22 +75,21 @@ void stop_fire() {
 
 void spread_fire() {
     int from, random;
-    from = FIRE_WIDTH;
-    for (int i = 1; i < FIRE_HEIGHT; i++) {
-        for (int y = 0; y < FIRE_WIDTH; y++) {
-            if (fire_pixels[from] == 0) {
-                fire_pixels[from - FIRE_WIDTH] = 0;
-            } else {
-                rand_num = rand_num * 1103515245 + 12345;
-                random = (rand_num & 2147483647) % 3;
-                fire_pixels[(from - random + 1) - FIRE_WIDTH] = fire_pixels[from] - (random & 1);
-            }
-            from++;
+
+    for(from = FIRE_WIDTH; from < FIRE_SIZE; from++) {
+        if (fire_pixels[from] == 0) {
+            fire_pixels[from - FIRE_WIDTH] = 0;
+        } else {
+            rand_num = rand_num * 1103515245 + 12345;
+            random = (rand_num & 2147483647) % 3;
+            fire_pixels[(from - random + 1) - FIRE_WIDTH] = fire_pixels[from] - (random & 1);
         }
     }
 }
 
 void setup() {
+
+    work = (char *)malloc(EgbWorkSize);
 
     //Screen set Mode12(640*480,256 Colors, 1 Page only)
     EGB_resolution( work, 0, 12 );
@@ -111,7 +114,8 @@ void setup() {
     }
 
     // clear fire map
-    memset(fire_pixels, 0, sizeof(fire_pixels));
+    fire_pixels = (unsigned char *)malloc(FIRE_HEIGHT * FIRE_WIDTH);
+    memset(fire_pixels, 0, FIRE_HEIGHT * FIRE_WIDTH);
 
     start_fire();
 
@@ -163,6 +167,7 @@ void draw_fire() {
     //WORD( para+10 ) = FIRE_WIDTH - 1;
     //WORD( para+12 ) = FIRE_HEIGHT - 1;
     EGB_putBlock( work, 0, para );
+
 }
 
 int main(int argc, char** argv) {
@@ -175,6 +180,8 @@ int main(int argc, char** argv) {
     }
 
     EGB_init( work, EgbWorkSize );
+    free(work);
+    free(fire_pixels);
 
     return 0;
 }
